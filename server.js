@@ -7,8 +7,8 @@ const conectarDB = require('./config/db');
 const app = express();
 
 // Validar variables de entorno críticas
-if (!process.env.FRONTEND_URL || !process.env.FRONTEND_URL_localhost) {
-  console.error('Faltan variables de entorno críticas. Verifica el archivo .env');
+if (!process.env.FRONTEND_URL || !process.env.FRONTEND_URL_localhost || !process.env.MONGO_URI) {
+  console.error('❌ Faltan variables de entorno críticas. Verifica el archivo .env');
   process.exit(1);
 }
 
@@ -26,7 +26,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.error(`CORS rechazado para el origen: ${origin}`);
+      console.error(`⚠️ CORS rechazado para el origen: ${origin}`);
       callback(new Error('No permitido por CORS'));
     }
   },
@@ -46,7 +46,32 @@ app.get('/robots.txt', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/robots.txt')); 
 });
 
-// Rutas de la API
+// ──────────────────────────────────────────────
+// 🔹 **Conexión a MongoDB Atlas**
+// ──────────────────────────────────────────────
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => console.log('✅ Conectado a MongoDB Atlas'))
+  .catch(err => {
+    console.error('❌ Error conectando a MongoDB Atlas', err);
+    process.exit(1); // Cerrar la aplicación si no se puede conectar
+  });
+
+// 🔹 **(Conexión Local - Comentada)**
+// mongoose.connect('mongodb://localhost:27017/seleccion_docente_db', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// })
+//   .then(() => console.log('✅ Conectado a MongoDB Local'))
+//   .catch(err => console.error('❌ Error conectando a MongoDB Local', err));
+
+// ──────────────────────────────────────────────
+// 🔹 **Rutas de la API**
+// ──────────────────────────────────────────────
 app.use('/materias', require('./routes/MateriaRoutes'));
 console.log('Ruta /materias cargada');
 
@@ -59,37 +84,28 @@ console.log('Ruta /postulaciones cargada');
 app.use('/api/concurso-meritos', require('./routes/meritoRoutes'));
 console.log('Ruta /api/concurso-meritos cargada');
 
-// Ruta para Examen de Competencias
 app.use('/api/examen-competencias', require('./routes/CompetenciasRoutes'));
 console.log('Ruta /api/examen-competencias cargada');
 
-// Ruta para Examen de Conocimientos (nuestra nueva funcionalidad)
 app.use('/api/examen-conocimientos', require('./routes/ConocimientosRoutes'));
 console.log('Ruta /api/examen-conocimientos cargada');
 
 app.use('/auth', require('./routes/authRoutes'));
 console.log('Ruta /auth cargada');
 
-// (Opcional) Repetición de la ruta usuarios si así lo requieres
-app.use('/usuarios', require('./routes/userRoutes'));
-console.log('Ruta /usuarios cargada');
-
-// Nueva Ruta para Workflow
 app.use('/api/workflow', require('./routes/workflowroutes'));
 console.log('Ruta /api/workflow cargada');
 
 // ──────────────────────────────────────────────
-// NUEVAS RUTAS PARA GESTIÓN DE DOCUMENTOS Y FIRMA DIGITAL
+// 🔹 **NUEVAS RUTAS PARA GESTIÓN DE DOCUMENTOS Y FIRMA DIGITAL**
 // ──────────────────────────────────────────────
 const multer = require('multer');
 const fs = require('fs');
 const { exec } = require('child_process');
 
-// Define las carpetas según tus variables de entorno o rutas por defecto
 const REQUISITOS_DIR = process.env.REQUISITOS_DIR || 'C:\\Decimoooo\\Trabajo de Grado II\\REQUISITOS';
 const FIRMA_DIR = process.env.FIRMA_DIR || 'C:\\Decimoooo\\Firma Digital';
 
-// Asegurar la existencia de las carpetas
 if (!fs.existsSync(REQUISITOS_DIR)) {
   fs.mkdirSync(REQUISITOS_DIR, { recursive: true });
 }
@@ -97,10 +113,9 @@ if (!fs.existsSync(FIRMA_DIR)) {
   fs.mkdirSync(FIRMA_DIR, { recursive: true });
 }
 
-// Servir archivos firmados desde la carpeta FIRMA_DIR
+// Servir archivos firmados desde FIRMA_DIR
 app.use('/firma', express.static(FIRMA_DIR));
 
-// Configuración de multer para guardar archivos en REQUISITOS_DIR
 const uploadFile = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
@@ -112,7 +127,6 @@ const uploadFile = multer({
   }),
 });
 
-// Endpoint para subir archivo y guardarlo en REQUISITOS_DIR
 app.post('/api/upload-file', uploadFile.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No se subió el archivo.' });
@@ -120,7 +134,6 @@ app.post('/api/upload-file', uploadFile.single('file'), (req, res) => {
   return res.json({ message: 'Archivo subido correctamente.', filename: req.file.filename });
 });
 
-// Endpoint para abrir Jacobitus como administrador
 app.post('/api/open-jacobitus', (req, res) => {
   const jacobitusPath = 'C:\\Program Files\\Jacobitus Total\\Jacobitus Total.exe';
   const command = `powershell -Command "Start-Process '${jacobitusPath}' -Verb runAs"`;
@@ -134,7 +147,6 @@ app.post('/api/open-jacobitus', (req, res) => {
   });
 });
 
-// Endpoint para listar documentos firmados (archivos PDF en FIRMA_DIR)
 app.get('/api/signed-documents', (req, res) => {
   fs.readdir(FIRMA_DIR, (err, files) => {
     if (err) {
@@ -151,7 +163,8 @@ app.get('/api/signed-documents', (req, res) => {
 });
 
 // ──────────────────────────────────────────────
-// Middleware para manejo de errores
+// 🔹 **Middleware para manejo de errores**
+// ──────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(err.stack);
   if (err.message === 'Tipo de archivo no permitido') {
@@ -163,8 +176,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Iniciar el servidor
+// ──────────────────────────────────────────────
+// 🔹 **Iniciar el servidor**
+// ──────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
 });
