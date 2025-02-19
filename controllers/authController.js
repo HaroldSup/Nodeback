@@ -7,7 +7,7 @@ exports.login = async (req, res) => {
   try {
     const { nombreUsuario, password } = req.body;
 
-    // Buscar el usuario por nombre de usuario
+    // Buscar el usuario por nombre de usuario de usuario
     const user = await User.findOne({ nombreUsuario });
     if (!user) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
