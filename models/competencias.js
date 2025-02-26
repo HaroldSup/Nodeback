@@ -16,8 +16,11 @@ const competenciasSchema = new mongoose.Schema(
     procesoDominio: { type: Number, required: true },
     procesoTICs: { type: Number, required: true },
     procesoExplicacion: { type: Number, required: true },
-    notaPlanTrabajo: { type: Number, required: true },         // Nuevo campo (30%)
-    notaProcesosPedagogicos: { type: Number, required: true }      // Nuevo campo (30%)
+    notaPlanTrabajo: { type: Number, required: true }, // 30%
+    notaProcesosPedagogicos: { type: Number, required: true }, // 30%
+
+    // NUEVO: Campo para el nombre del evaluador
+    nombreEvaluador: { type: String, required: false },
   },
   { timestamps: true }
 );

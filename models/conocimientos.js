@@ -1,4 +1,3 @@
-// models/conocimientos.js
 const mongoose = require('mongoose');
 
 const ConocimientosSchema = new mongoose.Schema({
@@ -9,7 +8,9 @@ const ConocimientosSchema = new mongoose.Schema({
   fecha: { type: Date, required: true },
   examenConocimientos: { type: Number, required: true },
   // notaFinal se calcula como examenConocimientos * 0.4
-  notaFinal: { type: Number, required: true }
+  notaFinal: { type: Number, required: true },
+  // NUEVO: Campo para el nombre del evaluador
+  nombreEvaluador: { type: String, required: false }
 });
 
 module.exports = mongoose.model('Conocimiento', ConocimientosSchema);

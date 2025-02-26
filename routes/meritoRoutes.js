@@ -1,5 +1,11 @@
 const express = require('express');
-const { getMeritos, createMerito, updateMerito, deleteMerito } = require('../controllers/meritoController');
+const {
+  getMeritos,
+  createMerito,
+  updateMerito,
+  deleteMerito,
+} = require('../controllers/meritoController');
+
 const router = express.Router();
 
 router.get('/', getMeritos);

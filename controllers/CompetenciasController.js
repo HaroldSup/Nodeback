@@ -14,6 +14,7 @@ exports.getCompetencias = async (req, res) => {
 // Crear una nueva competencia
 exports.createCompetencia = async (req, res) => {
   try {
+    // req.body puede incluir "nombreEvaluador"
     const nuevaCompetencia = new Competencia(req.body);
     const resultado = await nuevaCompetencia.save();
     res.status(201).json(resultado);
