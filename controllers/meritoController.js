@@ -21,7 +21,9 @@ exports.createMerito = async (req, res) => {
   }
 
   try {
-    // Aquí req.body podrá incluir "nombreEvaluador"
+    // Eliminar el campo "carrera" si se envía
+    if (req.body.carrera) delete req.body.carrera;
+
     const nuevoMerito = new Merito(req.body);
     const resultado = await nuevoMerito.save();
     res.status(201).json(resultado);
@@ -35,6 +37,9 @@ exports.updateMerito = async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Remover "carrera" de los datos enviados, en caso de existir
+    if (req.body.carrera) delete req.body.carrera;
+
     const meritoActualizado = await Merito.findByIdAndUpdate(id, req.body, {
       new: true,
     });

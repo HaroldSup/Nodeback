@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt');
 // Crear usuario
 exports.createUser = async (req, res) => {
   try {
-    const { nombre, nombreUsuario, email, password, activo, administrador, carreras, permisos } = req.body;
+    // Ahora se recibe el campo "carrera" (string) en lugar de "carreras"
+    const { nombre, nombreUsuario, email, password, activo, administrador, carrera, permisos } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -15,7 +16,7 @@ exports.createUser = async (req, res) => {
       password: hashedPassword,
       activo,
       administrador,
-      carreras,
+      carrera,  // Se asigna el campo carrera
       permisos,
     });
 
@@ -41,7 +42,8 @@ exports.getUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params; // ID del usuario a editar
-    const { nombre, nombreUsuario, email, password, activo, administrador, carreras, permisos } = req.body;
+    // Se desestructura "carrera" en lugar de "carreras"
+    const { nombre, nombreUsuario, email, password, activo, administrador, carrera, permisos } = req.body;
 
     // Crear objeto de actualización
     const updateData = {
@@ -50,7 +52,7 @@ exports.updateUser = async (req, res) => {
       email,
       activo,
       administrador,
-      carreras,
+      carrera,  // Se actualiza el campo carrera
       permisos,
     };
 

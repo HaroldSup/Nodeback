@@ -14,10 +14,9 @@ const meritoSchema = new mongoose.Schema({
     },
   },
   fechaEvaluacion: { type: Date, required: true },
-  carrera: { type: String, required: true },
+  // Se eliminó el campo "carrera"
   puntosEvaluacion: { type: Number, required: true },
-
-  // NUEVO: Campo para almacenar el nombre del evaluador
+  // Campo para almacenar el nombre del evaluador
   nombreEvaluador: { type: String, required: false },
 });
 

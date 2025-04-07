@@ -27,17 +27,18 @@ const getConocimientoById = async (req, res) => {
 // Crear un nuevo registro
 const createConocimiento = async (req, res) => {
   try {
-    const { tipoEvaluador, nombre, carnet, materia, fecha, examenConocimientos } = req.body;
+    // Extraer los campos del body, sin incluir "materia"
+    const { tipoEvaluador, nombre, carnet, fecha, examenConocimientos, nombreEvaluador } = req.body;
     // Calcular la nota final (40%)
     const notaFinal = parseFloat(examenConocimientos) * 0.4;
     const nuevoConocimiento = new Conocimiento({
       tipoEvaluador,
       nombre,
       carnet,
-      materia,
       fecha,
       examenConocimientos,
-      notaFinal
+      notaFinal,
+      nombreEvaluador
     });
     const registroGuardado = await nuevoConocimiento.save();
     res.status(201).json(registroGuardado);
@@ -49,12 +50,12 @@ const createConocimiento = async (req, res) => {
 // Actualizar un registro existente
 const updateConocimiento = async (req, res) => {
   try {
-    const { tipoEvaluador, nombre, carnet, materia, fecha, examenConocimientos } = req.body;
+    const { tipoEvaluador, nombre, carnet, fecha, examenConocimientos, nombreEvaluador } = req.body;
     // Recalcular la nota final (40%)
     const notaFinal = parseFloat(examenConocimientos) * 0.4;
     const registroActualizado = await Conocimiento.findByIdAndUpdate(
       req.params.id,
-      { tipoEvaluador, nombre, carnet, materia, fecha, examenConocimientos, notaFinal },
+      { tipoEvaluador, nombre, carnet, fecha, examenConocimientos, notaFinal, nombreEvaluador },
       { new: true }
     );
     if (!registroActualizado) {

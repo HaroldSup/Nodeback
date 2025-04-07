@@ -7,8 +7,9 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   activo: { type: Boolean, default: true },
   administrador: { type: Boolean, default: false },
-  carreras: [{ type: String }],
-  permisos: { type: Map, of: Boolean }, 
+  // Se reemplaza "carreras" por "carrera" de tipo String
+  carrera: { type: String, required: true },
+  permisos: { type: Map, of: Boolean },
 }, {
   timestamps: true,
 });
