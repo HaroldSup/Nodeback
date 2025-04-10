@@ -48,7 +48,6 @@ exports.createPostulacion = async (req, res) => {
     }
 
     // Procesar archivos subidos
-    // Definimos la lista de claves de documentos que se esperan
     const documentKeys = [
       'cartaDocenteAntiguoLicenciatura',
       'cartaDocenteAntiguoTecnologico',
@@ -100,7 +99,7 @@ exports.createPostulacion = async (req, res) => {
       anioTitulacion,
       carrera,
       tipoDocente,
-      asignaturasSeleccionadas: asignaturas,
+      asignaturasSeleccionadas: asignaturas, // Cada objeto debe venir con propiedad "carrera"
       documentos,
     });
 
@@ -136,11 +135,9 @@ exports.deletePostulacion = async (req, res) => {
   }
 };
 
-// NUEVA FUNCIÓN: Buscar postulante por número de carnet
 exports.getPostulanteByCarnet = async (req, res) => {
   try {
     const { carnet } = req.params;
-    // Se asume que el campo "ci" almacena el número de carnet
     const postulacion = await Postulacion.findOne({ ci: carnet });
     if (postulacion) {
       return res.status(200).json({ data: postulacion });

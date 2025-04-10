@@ -10,12 +10,12 @@ const PostulacionSchema = new mongoose.Schema({
   anioTitulacion: { type: String, required: true },
   carrera: { type: String, required: true },
   tipoDocente: { type: String, required: true },
-  // Almacenamos cada asignatura como un objeto con sus datos
+  // Actualizamos para usar 'carrera' en cada asignatura
   asignaturasSeleccionadas: {
     type: [
       {
         asignatura: { type: String },
-        departamento: { type: String },
+        carrera: { type: String }, // <-- Campo actualizado
         nivel: { type: String },
       },
     ],
