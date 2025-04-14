@@ -27,18 +27,33 @@ const getConocimientoById = async (req, res) => {
 // Crear un nuevo registro
 const createConocimiento = async (req, res) => {
   try {
-    // Extraer los campos del body, sin incluir "materia"
-    const { tipoEvaluador, nombre, carnet, fecha, examenConocimientos, nombreEvaluador } = req.body;
+    // Extraer los campos del body, sin incluir "tipoEvaluador"
+    const { 
+      nombre, 
+      carnet, 
+      fecha, 
+      examenConocimientos, 
+      nombreEvaluador, 
+      profesion, 
+      materia, 
+      carrera, 
+      habilitado, 
+      observaciones 
+    } = req.body;
     // Calcular la nota final (40%)
     const notaFinal = parseFloat(examenConocimientos) * 0.4;
     const nuevoConocimiento = new Conocimiento({
-      tipoEvaluador,
       nombre,
       carnet,
       fecha,
       examenConocimientos,
       notaFinal,
-      nombreEvaluador
+      nombreEvaluador,
+      profesion,
+      materia,
+      carrera,
+      habilitado,
+      observaciones
     });
     const registroGuardado = await nuevoConocimiento.save();
     res.status(201).json(registroGuardado);
@@ -50,12 +65,35 @@ const createConocimiento = async (req, res) => {
 // Actualizar un registro existente
 const updateConocimiento = async (req, res) => {
   try {
-    const { tipoEvaluador, nombre, carnet, fecha, examenConocimientos, nombreEvaluador } = req.body;
+    const { 
+      nombre, 
+      carnet, 
+      fecha, 
+      examenConocimientos, 
+      nombreEvaluador, 
+      profesion, 
+      materia, 
+      carrera, 
+      habilitado, 
+      observaciones 
+    } = req.body;
     // Recalcular la nota final (40%)
     const notaFinal = parseFloat(examenConocimientos) * 0.4;
     const registroActualizado = await Conocimiento.findByIdAndUpdate(
       req.params.id,
-      { tipoEvaluador, nombre, carnet, fecha, examenConocimientos, notaFinal, nombreEvaluador },
+      { 
+        nombre, 
+        carnet, 
+        fecha, 
+        examenConocimientos, 
+        notaFinal, 
+        nombreEvaluador, 
+        profesion, 
+        materia, 
+        carrera, 
+        habilitado, 
+        observaciones 
+      },
       { new: true }
     );
     if (!registroActualizado) {

@@ -21,9 +21,7 @@ exports.createMerito = async (req, res) => {
   }
 
   try {
-    // Eliminar el campo "carrera" si se envía
-    if (req.body.carrera) delete req.body.carrera;
-
+    // Ahora ya NO eliminamos el campo "carrera" (y tampoco otros campos nuevos)
     const nuevoMerito = new Merito(req.body);
     const resultado = await nuevoMerito.save();
     res.status(201).json(resultado);
@@ -37,9 +35,7 @@ exports.updateMerito = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Remover "carrera" de los datos enviados, en caso de existir
-    if (req.body.carrera) delete req.body.carrera;
-
+    // No se elimina ningún campo, se actualiza con los datos enviados
     const meritoActualizado = await Merito.findByIdAndUpdate(id, req.body, {
       new: true,
     });

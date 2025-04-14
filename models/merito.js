@@ -14,10 +14,14 @@ const meritoSchema = new mongoose.Schema({
     },
   },
   fechaEvaluacion: { type: Date, required: true },
-  // Se eliminó el campo "carrera"
   puntosEvaluacion: { type: Number, required: true },
-  // Campo para almacenar el nombre del evaluador
   nombreEvaluador: { type: String, required: false },
+  // Nuevos campos añadidos:
+  profesion: { type: String, default: '' },
+  materia: { type: String, default: '' },
+  carrera: { type: String, default: '' },
+  habilitado: { type: String, default: '' },
+  observaciones: { type: String, default: '' },
 });
 
 module.exports = mongoose.model('Merito', meritoSchema);
