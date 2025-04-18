@@ -6,7 +6,7 @@ const competenciasSchema = new mongoose.Schema(
     nombre: { type: String, required: true },
     carnet: { type: String, required: true },
     materia: { type: String, required: true },
-    carrera: { type: String, required: true }, // NUEVO: Campo para la Carrera
+    carrera: { type: String, required: true }, 
     fecha: { type: Date, required: true },
     planConcordancia: { type: Number, required: true },
     planCompetencia: { type: Number, required: true },
@@ -17,8 +17,8 @@ const competenciasSchema = new mongoose.Schema(
     procesoDominio: { type: Number, required: true },
     procesoTICs: { type: Number, required: true },
     procesoExplicacion: { type: Number, required: true },
-    notaPlanTrabajo: { type: Number, required: true }, // 30%
-    notaProcesosPedagogicos: { type: Number, required: true }, // 30%
+    notaPlanTrabajo: { type: Number, required: true }, 
+    notaProcesosPedagogicos: { type: Number, required: true }, 
     nombreEvaluador: { type: String, required: false },
   },
   { timestamps: true }
