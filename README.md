@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://nodejs.org/static/images/logo.svg" width="150" alt="Node.js Logo" />
+  <img src="./7f2eaa9d-7b00-478c-93a9-cf55f7b47308.png" width="250" alt="NestJS Logo" />
 </p>
 
 <p align="center">
