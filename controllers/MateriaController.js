@@ -16,29 +16,49 @@ exports.createMateria = async (req, res) => {
       motivosAcefalia,
     } = req.body;
 
+    console.log('Datos recibidos:', req.body); // Para debug
+
     // Validar campos requeridos
-    if (!asignatura || !semestre || !nivelAcademico || !carrera || !gestion) {
+    if (!asignatura || !requisitos || !semestre || !nivelAcademico || !carrera || !gestion || !motivosAcefalia) {
       return res.status(400).json({
         message: 'Faltan campos obligatorios para registrar la materia.',
+        required: ['asignatura', 'requisitos', 'semestre', 'nivelAcademico', 'carrera', 'gestion', 'motivosAcefalia'],
+        received: req.body
+      });
+    }
+
+    // Verificar si ya existe una materia con los mismos datos
+    const existingMateria = await Materia.findOne({
+      asignatura: asignatura.trim(),
+      carrera: carrera.trim(),
+      semestre: semestre.trim()
+    });
+
+    if (existingMateria) {
+      return res.status(409).json({
+        message: 'Ya existe una materia con la misma asignatura, carrera y semestre.',
+        exists: true
       });
     }
 
     // Crear una nueva materia
     const materia = new Materia({
-      asignatura,
-      requisitos,
-      semestre,
-      nivelAcademico,
-      carrera,
-      gestion,
-      horasTeoria,
-      horasPracticas,
-      horasLaboratorio,
-      motivosAcefalia,
+      asignatura: asignatura.trim(),
+      requisitos: requisitos.trim(),
+      semestre: semestre.trim(),
+      nivelAcademico: nivelAcademico.trim(),
+      carrera: carrera.trim(),
+      gestion: gestion.trim(),
+      horasTeoria: parseInt(horasTeoria) || 0,
+      horasPracticas: parseInt(horasPracticas) || 0,
+      horasLaboratorio: parseInt(horasLaboratorio) || 0,
+      motivosAcefalia: motivosAcefalia.trim(),
     });
 
     // Guardar en la base de datos
     const savedMateria = await materia.save();
+
+    console.log('Materia guardada:', savedMateria); // Para debug
 
     // Devolver una respuesta clara
     res.status(201).json({
@@ -48,6 +68,16 @@ exports.createMateria = async (req, res) => {
   } catch (error) {
     console.error('Error al registrar materia:', error);
 
+    // Manejar errores de validación de Mongoose
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        message: 'Error de validación',
+        errors: errors,
+        details: error.errors
+      });
+    }
+
     // Enviar un mensaje de error claro al frontend
     res.status(500).json({
       message: 'Error al registrar la materia. Inténtalo nuevamente.',
@@ -56,16 +86,41 @@ exports.createMateria = async (req, res) => {
   }
 };
 
+// Verificar si una materia existe (para el frontend)
+exports.verificarMateria = async (req, res) => {
+  try {
+    const { asignatura, carrera, semestre } = req.body;
+
+    if (!asignatura || !carrera || !semestre) {
+      return res.status(400).json({
+        message: 'Faltan datos para verificar la materia',
+        required: ['asignatura', 'carrera', 'semestre']
+      });
+    }
+
+    const existingMateria = await Materia.findOne({
+      asignatura: asignatura.trim(),
+      carrera: carrera.trim(),
+      semestre: semestre.trim()
+    });
+
+    res.status(200).json({
+      exists: !!existingMateria,
+      materia: existingMateria || null
+    });
+  } catch (error) {
+    console.error('Error al verificar materia:', error);
+    res.status(500).json({
+      message: 'Error al verificar la materia',
+      error: error.message,
+    });
+  }
+};
+
 // Obtener todas las materias
 exports.getMaterias = async (req, res) => {
   try {
-    const materias = await Materia.find();
-
-    if (!materias || materias.length === 0) {
-      return res.status(404).json({
-        message: 'No se encontraron materias.',
-      });
-    }
+    const materias = await Materia.find().sort({ createdAt: -1 });
 
     res.status(200).json(materias);
   } catch (error) {
@@ -96,7 +151,7 @@ exports.updateMateria = async (req, res) => {
     } = req.body;
 
     // Validar campos requeridos
-    if (!asignatura || !semestre || !nivelAcademico || !carrera || !gestion) {
+    if (!asignatura || !requisitos || !semestre || !nivelAcademico || !carrera || !gestion || !motivosAcefalia) {
       return res.status(400).json({
         message: 'Faltan campos obligatorios para actualizar la materia.',
       });
@@ -106,18 +161,18 @@ exports.updateMateria = async (req, res) => {
     const updatedMateria = await Materia.findByIdAndUpdate(
       id,
       {
-        asignatura,
-        requisitos,
-        semestre,
-        nivelAcademico,
-        carrera,
-        gestion,
-        horasTeoria,
-        horasPracticas,
-        horasLaboratorio,
-        motivosAcefalia,
+        asignatura: asignatura.trim(),
+        requisitos: requisitos.trim(),
+        semestre: semestre.trim(),
+        nivelAcademico: nivelAcademico.trim(),
+        carrera: carrera.trim(),
+        gestion: gestion.trim(),
+        horasTeoria: parseInt(horasTeoria) || 0,
+        horasPracticas: parseInt(horasPracticas) || 0,
+        horasLaboratorio: parseInt(horasLaboratorio) || 0,
+        motivosAcefalia: motivosAcefalia.trim(),
       },
-      { new: true, runValidators: true } // `runValidators` asegura que se respeten las validaciones del modelo
+      { new: true, runValidators: true }
     );
 
     if (!updatedMateria) {
@@ -128,10 +183,18 @@ exports.updateMateria = async (req, res) => {
 
     res.status(200).json({
       message: 'Materia actualizada exitosamente',
-      updatedMateria,
+      materia: updatedMateria,
     });
   } catch (error) {
     console.error('Error al actualizar materia:', error);
+
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        message: 'Error de validación',
+        errors: errors
+      });
+    }
 
     res.status(500).json({
       message: 'Error al actualizar la materia. Inténtalo nuevamente.',

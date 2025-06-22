@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  zeebe-broker:
+    image: camunda/zeebe:latest
+    container_name: zeebe-broker
+    ports:
+      - "26500:26500" # Puerto gRPC utilizado por el backend
+    environment:
+      - ZEEBE_LOG_LEVEL=info
+      - ZEEBE_BROKER_NETWORK_HOST=0.0.0.0
+      - ZEEBE_BROKER_GATEWAY_ENABLE=true
+      - ZEEBE_BROKER_GATEWAY_NETWORK_HOST=0.0.0.0
+      - ZEEBE_BROKER_GATEWAY_NETWORK_PORT=26500

@@ -23,11 +23,20 @@ const MateriaAcefalaSchema = new mongoose.Schema({
     nivelAcademico: { 
         type: String, 
         required: [true, 'El campo "nivelAcadémico" es obligatorio'], 
-        enum: ['Grado', 'Postgrado'] 
+        enum: ['Grado', 'Licenciatura', 'Tecnologico'] // ✅ ACTUALIZADO
     },
     carrera: { 
         type: String, 
         required: [true, 'El campo "carrera" es obligatorio'], 
+        enum: [ // ✅ AGREGADO ENUM PARA CARRERA
+            'Ciencias Básicas',
+            'Materia Militar',
+            'Ingeniería de Sistemas',
+            'Ingeniería en Sistemas Electrónicos',
+            'Ingeniería Agroindustrial',
+            'Ingeniería Civil',
+            'Ingeniería Comercial'
+        ],
         trim: true 
     },
     gestion: { 
@@ -52,7 +61,8 @@ const MateriaAcefalaSchema = new mongoose.Schema({
         min: [0, 'Las horas de laboratorio no pueden ser negativas'] 
     },
     motivosAcefalia: { 
-        type: String, 
+        type: String,
+        required: [true, 'El campo "motivos de acefalia" es obligatorio'], // ✅ AGREGADO REQUIRED
         trim: true 
     },
     createdAt: { 
